@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    environment {
+        GIT_REPO = 'git@github.com:thejasreealuri1808/python-jenkins-app.git'
+        GIT_BRANCH = 'main'
+
+        REGISTRY = 'localhost:5000'
+        IMAGE_NAME = 'python-jenkins'
+        IMAGE_TAG = "${BUILD_NUMBER}"
+    }
+	stage('Checkout') {
+            steps {
+                 git credentialsId: 'git', url: 'git@github.com:thejasreealuri1808/java11-examples.git'
+		}
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh """
+                        docker build -t ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} .
+                        docker tag ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} ${REGISTRY}/${IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                sh """
+                    docker push ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                    docker push ${REGISTRY}/${IMAGE_NAME}:latest
+                """
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
