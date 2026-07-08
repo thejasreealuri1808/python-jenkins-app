@@ -9,11 +9,14 @@ pipeline {
         IMAGE_NAME = 'python-jenkins'
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
-	stage('Checkout') {
+
+    stages {
+        stage('Checkout') {
             steps {
-                 git credentialsId: 'git', url: 'git@github.com:thejasreealuri1808/java11-examples.git'
-		}
-        stage('Build Docker Image') {
+                checkout scm
+            }
+        }        
+	stage('Build Docker Image') {
             steps {
                 script {
                     sh """
